@@ -4,7 +4,6 @@ pipeline {
     stage ("Build") {
       agent {
         docker {
-           label 'webapps'
            image 'maven:3.6.0-jdk-8-alpine'
            args '-v /root/.m2/repository:/root/.m2/repository'
         }

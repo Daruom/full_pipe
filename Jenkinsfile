@@ -5,6 +5,7 @@ pipeline {
       agent {
         docker {
            image 'maven:3.6.0-jdk-8-alpine'
+	   image 'docker:dind'
            args '-v /root/.m2/repository:/root/.m2/repository'
         }
       }

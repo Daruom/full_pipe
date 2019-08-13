@@ -40,10 +40,7 @@ pipeline {
     }
     stage("JUnit tests") {
       when {
-        anyOf {
-          branch 'master';
-          branch 'develop'
-        }
+        anyOf { branch 'master'; branch 'develop' }
       }
       agent {
         docker {
@@ -57,7 +54,7 @@ pipeline {
       }
       post {
         always {
-         junit 'target/surefire-reports/**/*.xml'          
+         junit 'target/surefire-reports/**/*.xml'
         }
       }
     }

@@ -10,7 +10,7 @@ pipeline {
       }
       steps {
               sh 'mvn clean package'
-              sh "/usr/local/bin/docker build . -t tomcatwebappserver:${env.BUILD_ID}"
+              sh "/usr/bin/docker build . -t tomcatwebappserver:${env.BUILD_ID}"
 
       }
     }

@@ -40,7 +40,7 @@ pipeline {
     }
     stage("JUnit tests") {
       when {
-        anyOf { branch 'master'; branch 'develop' }
+        anyOf { branch 'master' }
       }
       agent {
         docker {

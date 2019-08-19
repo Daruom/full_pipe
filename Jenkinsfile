@@ -39,9 +39,9 @@ pipeline {
       }
     }
     stage("JUnit tests") {
-      when {
-       anyOf { branch 'master'; branch 'develop' }
-      }
+      // when {
+      //  anyOf { branch 'master'; branch 'develop' }
+      // }
       agent {
         docker {
           image 'maven:3.6.0-jdk-8-alpine'

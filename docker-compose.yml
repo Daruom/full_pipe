@@ -1,5 +1,23 @@
-version : '3'
+version : '3.5'
 services:
+  jenkins:
+    restart: unless-stopped
+    user: jenkins
+    build :
+      context: .
+      dockerfile: jenkins-server.Dockerfile
+
+    ports:
+      - "8050:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins-volume:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+    networks:
+      - devops
+
+
   sonarqube:
     image: sonarqube:alpine
     restart: always
@@ -10,3 +28,15 @@ services:
       - ./sonarqube/conf:/opt/sonarqube/conf
       - ./sonarqube/data:/opt/sonarqube/data
       - ./sonarqube/extensions:/opt/sonarqube/extensions
+    networks:
+      - devops
+
+volumes:
+  jenkins-volume:
+    external: true
+
+
+networks:
+  devops:
+    name: devops
+    driver: bridge

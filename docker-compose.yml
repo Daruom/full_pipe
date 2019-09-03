@@ -1,7 +1,7 @@
 version : '3.5'
 services:
   jenkins:
-    restart: unless-stopped
+    restart: always
     user: jenkins
     build :
       context: .
@@ -17,7 +17,6 @@ services:
     networks:
       - devops
 
-
   sonarqube:
     image: sonarqube:alpine
     restart: always
@@ -28,6 +27,16 @@ services:
       - ./sonarqube/conf:/opt/sonarqube/conf
       - ./sonarqube/data:/opt/sonarqube/data
       - ./sonarqube/extensions:/opt/sonarqube/extensions
+    networks:
+      - devops
+
+  nexus:
+    image: sonatype/nexus3
+    restart: always
+    volumes:
+      - ./nexus-data:/nexus-data sonatype/nexus3
+    ports:
+      - "9050:8081"
     networks:
       - devops
 

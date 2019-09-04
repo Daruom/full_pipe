@@ -173,6 +173,8 @@ pipeline {
        echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
        // Extract the path from the File found
        artifactPath = filesByGlob[0].path;
+       echo "$(artifactPath)"
+
        // Assign to a boolean response verifying If the artifact name exists
        artifactExists = fileExists artifactPath;
        if (artifactExists) {
@@ -201,6 +203,37 @@ pipeline {
         )
        } else {
         error "*** File: ${artifactPath}, could not be found";
+       }
+      }
+     }
+    }
+    stage('Deploy to Staging Servers') {
+     agent {
+      docker {
+       image 'ahmed24khaled/ansible-management'
+       reuseNode true
+      }
+     }
+     steps {
+      script {
+
+       pom = readMavenPom file: "pom.xml"
+       repoPath = "${pom.groupId}".replace(".", "/") + "/${pom.artifactId}"
+       version = pom.version
+       artifactId = pom.artifactId
+       withEnv(["ANSIBLE_HOST_KEY_CHECKING=False", "APP_NAME=${artifactId}", "repoPath=${repoPath}", "version=${version}"]) {
+        sh '''
+
+          curl --silent "http://$NEXUS_URL/repository/maven-snapshots/${repoPath}/${version}/maven-metadata.xml" > tmp &&
+          egrep '<value>+([0-9\\-\\.]*)' tmp > tmp2 &&
+          tail -n 1 tmp2 > tmp3 &&
+          tr -d "</value>[:space:]" < tmp3 > tmp4 &&
+          REPO_VERSION=$(cat tmp4) &&
+
+          export APP_SRC_URL="http://${NEXUS_URL}/repository/maven-snapshots/${repoPath}/${version}/${APP_NAME}-${REPO_VERSION}.war" &&
+          ansible-playbook -v -i ./ansible_provisioning/hosts --extra-vars "host=staging" ./ansible_provisioning/playbook.yml
+
+         '''
        }
       }
      }
